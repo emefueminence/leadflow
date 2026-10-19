@@ -1,25 +1,38 @@
-# LeadFlow AI
+# LeadFlow AI — Rebuild v2
 
-Functional zero-cost MVP for lead capture, organization, qualification and follow-up, initially tailored to Lagos real-estate teams.
+LeadFlow AI is a lead-management and automation MVP for real-estate teams. This branch rebuilds the product against the original 504-line master specification.
 
-## Working features
-- Browser-local persistence (demo mode)
-- Lead CRUD, search, status filtering and CSV export
-- Dashboard metrics calculated from stored leads
-- Follow-up queues: overdue, today, upcoming and no date
-- Clearly labelled deterministic demo AI for category, priority, summary and reply drafting
-- n8n webhook configuration UI without fake connection claims
-- Fictional demo records and reset controls
-- Responsive desktop/mobile UI
+## Current phase
+Phase 1–3 are in progress: responsive UI, Base44-compatible lead model, CRUD-style local workflow, dashboard metrics, search/filter, duplicate warnings, CSV export, follow-up queues, settings and 10 fictional Lagos demo leads.
 
-## Local run
-`npm install` then `npm run dev`.
+## Run
+```bash
+npm install
+npm run dev
+npm run build
+```
 
-## Deployment
-Vercel detects Vite. Build command: `npm run build`; output directory: `dist`.
+## Architecture
+The current branch deliberately retains browser persistence while the shared backend/auth layer is being added. Local storage is demo-only and is not represented as a secure multi-user database.
 
-## Connected mode roadmap
-This initial deployment intentionally requires no paid services or API keys. It does not fake external AI, a shared database, authentication, webhook verification or outbound messaging. Production mode should add shared persistence/auth plus server-side AI and n8n proxy endpoints. Keep secrets server-side and send only necessary lead fields.
+Target connected-mode architecture:
+- React/TypeScript frontend
+- authenticated shared relational database with per-user access controls
+- server-side Gemini processing via `GEMINI_API_KEY`
+- server-side n8n webhook proxy via `N8N_WEBHOOK_URL`
+- public intake only after shared persistence exists
+- human approval before any outbound reply
 
-## AI safety
-The included fallback is visibly labelled deterministic demo logic. It never auto-sends a reply. A connected AI endpoint should validate structured output and fail safely.
+## Safety
+No external AI or webhook success is fabricated. The current AI helper is a clearly labelled deterministic demo fallback. No reply is auto-sent.
+
+## Remaining acceptance work
+- shared database + authentication/access controls
+- date/category/priority/status dashboard filters and lead sorting
+- stricter email validation and duplicate-review UX
+- public intake form backed by shared storage
+- real server-side Gemini endpoint and structured response validation
+- real n8n proxy, timeout, idempotency and connection-result tracking
+- demo-only clearing without deleting real records
+- documentation for AI, n8n, deployment and acceptance testing
+- run and record the full 20-item acceptance checklist
