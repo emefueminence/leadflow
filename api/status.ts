@@ -1,0 +1,2 @@
+import{json}from'./_shared.js';
+export default async function handler(req:any,res:any){if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});return json(res,200,{supabase:Boolean(process.env.SUPABASE_SECRET_KEY),gemini:Boolean(process.env.GEMINI_API_KEY),n8n:{configured:Boolean(process.env.N8N_WEBHOOK_URL),allowlist:Boolean(process.env.N8N_ALLOWED_HOSTS)},intakeRateSalt:Boolean(process.env.INTAKE_RATE_SALT)})}
