@@ -1,38 +1,35 @@
-# LeadFlow AI — Rebuild v2
+# LeadFlow AI — organization-first rebuild
 
-LeadFlow AI is a lead-management and automation MVP for real-estate teams. This branch rebuilds the product against the original 504-line master specification.
+LeadFlow AI is being developed as a configurable, multi-tenant business relationship, lead-management and workflow automation platform. It is designed to support solo operators, small businesses, mid-sized companies and enterprise organizations across different industries and business models.
 
-## Current phase
-Phase 1–3 are in progress: responsive UI, Base44-compatible lead model, CRUD-style local workflow, dashboard metrics, search/filter, duplicate warnings, CSV export, follow-up queues, settings and 10 fictional Lagos demo leads.
+## Product foundation
+- Universal lead, contact, opportunity, task and follow-up workflows.
+- Configurable pipelines, stages and industry-specific templates.
+- Organization, division, department, business unit, branch, team and individual scopes.
+- Role-based permissions combined with record-level access scopes.
+- AI assistance and automation that respect tenant boundaries.
+- Human approval before any AI-generated outbound message is sent.
+
+## Development status
+The current rebuild-v2 branch contains the existing LeadFlow app and server-side AI/automation work. The UI still contains legacy real-estate-specific fields and is being generalized. The additive organization-first database migration is under supabase/migrations; it must be applied and verified in a non-production database before the app is switched to organization-aware queries.
 
 ## Run
-```bash
+```
 npm install
 npm run dev
 npm run build
 ```
 
 ## Architecture
-The current branch deliberately retains browser persistence while the shared backend/auth layer is being added. Local storage is demo-only and is not represented as a secure multi-user database.
+- React + TypeScript frontend.
+- Supabase Auth and PostgreSQL with RLS.
+- Organization-scoped memberships, teams, organizational units and settings.
+- Server-side Gemini processing.
+- Server-side n8n workflow proxy with allowlisting, timeout and idempotency.
+- Configurable workflows and custom fields.
+- Human review before outbound communication.
 
-Target connected-mode architecture:
-- React/TypeScript frontend
-- authenticated shared relational database with per-user access controls
-- server-side Gemini processing via `GEMINI_API_KEY`
-- server-side n8n webhook proxy via `N8N_WEBHOOK_URL`
-- public intake only after shared persistence exists
-- human approval before any outbound reply
+## Security and rollout
+See docs/ORGANIZATION_ARCHITECTURE.md and docs/SECURITY_AND_INTEGRATION_PROTOCOL.md.
 
-## Safety
-No external AI or webhook success is fabricated. The current AI helper is a clearly labelled deterministic demo fallback. No reply is auto-sent.
-
-## Remaining acceptance work
-- shared database + authentication/access controls
-- date/category/priority/status dashboard filters and lead sorting
-- stricter email validation and duplicate-review UX
-- public intake form backed by shared storage
-- real server-side Gemini endpoint and structured response validation
-- real n8n proxy, timeout, idempotency and connection-result tracking
-- demo-only clearing without deleting real records
-- documentation for AI, n8n, deployment and acceptance testing
-- run and record the full 20-item acceptance checklist
+Production remains on main. Do not merge or deploy organization schema changes to production without explicit approval and successful preview acceptance tests.
