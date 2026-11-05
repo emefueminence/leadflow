@@ -21,7 +21,10 @@ export async function canAccessLead(db: SupabaseClient, membership: any, lead: a
     return Boolean(data);
   }
   if (membership.access_scope === 'unit') {
-    if (!lead.org_unit_id || !membership.org_unit_id) return false;
+    if (!membership.org_unit_id) return false;
+    let leadUnitId = lead.org_unit_id;
+    if (!leadUnitId && lead.team_id) { const { data: team, error: teamError } = await db.from('teams').select('org_unit_id').eq('organization_id',membership.organization_id).eq('id',lead.team_id).maybeSingle(); if (teamError) throw teamError; leadUnitId = team?.org_unit_id || null; }
+    if (!leadUnitId) return false;
     const { data, error } = await db.from('org_units').select('id,parent_id')
       .eq('organization_id', membership.organization_id);
     if (error) throw error;
@@ -36,7 +39,7 @@ export async function canAccessLead(db: SupabaseClient, membership: any, lead: a
         }
       }
     }
-    return visible.has(lead.org_unit_id);
+    return visible.has(leadUnitId);
   }
   return false;
 }
