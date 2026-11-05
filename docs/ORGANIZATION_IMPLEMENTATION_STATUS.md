@@ -19,6 +19,7 @@ Core tables:
 - `pipelines`
 - `pipeline_stages`
 - `custom_field_definitions`
+- `accounts`, `contacts`, `opportunities`, `tasks`, and `activities`
 - `accounts`
 - `contacts`
 - `opportunities`
@@ -45,7 +46,8 @@ Legacy `leads`, `settings`, and `automation_events` remain in place and now carr
 - Configure pipelines, add stages, and choose the default pipeline.
 - Define custom fields for leads, contacts, opportunities, accounts, tasks, and activities.
 - Create leads with workspace pipeline/stage and custom fields.
-- Accounts, contacts, opportunities, tasks, and activity screens.
+- Accounts, contacts, opportunities, tasks, and activity screens with organization ownership and scoped access.
+- Custom-field definitions and inputs for leads and the other business record types.
 - Workspace switcher for users belonging to multiple organizations.
 - Industry-neutral AI lead analysis.
 - Organization-aware AI and n8n endpoints.
@@ -66,18 +68,23 @@ Legacy `leads`, `settings`, and `automation_events` remain in place and now carr
 ## Verification completed
 - Signup bootstrap trigger tested inside a transaction; it created the expected organization, owner membership, default pipeline, six stages, and settings, then the test rows were rolled back.
 - Two-tenant RLS test confirmed a second tenant could not read the first tenant's organization or lead.
+- Scope test confirmed team access saw only team records, unit access saw records in its department and child units, and personal access saw only personally assigned records.
+- Supabase performance advisor reported no unindexed foreign keys; remaining notices are unused-index INFO findings on empty tables.
 - Supabase security advisor returned no security findings after the organization foundation.
 - Existing preview build at commit `62c338243ebce74df1299f7599da8abed6dd3d3b` reached READY.
-- A later build exposed and led to correction of a JSX fragment issue. Continue checking the newest preview deployment before treating the latest commit as build-verified.
+- Vercel preview build for commit `3f0936f6595f7e22236a0614c8d72aae8b51009a` reached READY. The next commit adds more detailed Auth diagnostics and is still being verified.
 
 ## Not yet verified / next work
-- Complete browser signup/login and first-workspace onboarding with the user; the previous browser reported `Failed to fetch`, so authentication connectivity still needs a live user-side retest.
+- Complete browser signup/login and first-workspace onboarding with the user; the previous browser reported `Failed to fetch`. The server-side Auth diagnostic endpoint is being used to distinguish Supabase reachability from browser/network/CORS problems.
 - End-to-end create/read/update tests for each business-record module.
 - Invite email delivery and acceptance; depends on Supabase Auth email configuration.
 - Existing-account invitation/adding, member role changes, removal, and bulk team assignment.
 - Full audit history and organization-level analytics.
 - Automation templates, scheduled task workflows, provider integrations, billing/plan entitlements, and enterprise SSO.
 - Update the checked-in migration source to match the exact applied schema before using a clean local reset workflow.
+
+## Current data state
+A read-only count check returned zero auth users, organizations, leads, accounts, contacts, opportunities, tasks, and activities. The temporary test users and records used for trigger and RLS tests were rolled back. No customer records were created or altered.
 
 ## Important
 The database and application foundation is implemented, but this is not yet a production release. Keep all work on `rebuild-v2` until end-to-end acceptance tests pass and the user explicitly approves production promotion.
