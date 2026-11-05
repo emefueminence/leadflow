@@ -108,6 +108,7 @@ create table if not exists public.pipeline_stages (
   position integer not null default 0,
   outcome text not null default 'open' check (outcome in ('open','won','lost')),
   created_at timestamptz not null default now(),
+  unique (organization_id,id),
   unique (pipeline_id,position),
   foreign key (organization_id,pipeline_id)
     references public.pipelines(organization_id,id) on delete cascade
@@ -212,7 +213,8 @@ alter table public.leads
     foreign key (organization_id,pipeline_id)
     references public.pipelines(organization_id,id) on delete restrict,
   add constraint leads_stage_fk
-    foreign key (stage_id) references public.pipeline_stages(id) on delete set null;
+    foreign key (organization_id,stage_id)
+    references public.pipeline_stages(organization_id,id) on delete set null;
 
 alter table public.leads alter column organization_id set not null;
 
