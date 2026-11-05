@@ -19,7 +19,6 @@ Core tables:
 - `pipelines`
 - `pipeline_stages`
 - `custom_field_definitions`
-- `accounts`, `contacts`, `opportunities`, `tasks`, and `activities`
 - `accounts`
 - `contacts`
 - `opportunities`
