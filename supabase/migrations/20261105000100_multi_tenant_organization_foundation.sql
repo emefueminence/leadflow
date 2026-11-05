@@ -63,7 +63,7 @@ create table if not exists public.teams (
   updated_at timestamptz not null default now(),
   unique (organization_id,id),
   foreign key (organization_id,org_unit_id)
-    references public.org_units(organization_id,id) on delete set null
+    references public.org_units(organization_id,id) on delete restrict
 );
 
 create table if not exists public.team_memberships (
@@ -204,17 +204,25 @@ alter table public.leads
     foreign key (owner_user_id) references auth.users(id) on delete set null,
   add constraint leads_org_unit_fk
     foreign key (organization_id,org_unit_id)
-    references public.org_units(organization_id,id) on delete set null,
+    references public.org_units(organization_id,id) on delete restrict,
   add constraint leads_team_fk
     foreign key (organization_id,team_id)
-    references public.teams(organization_id,id) on delete set null,
+    references public.teams(organization_id,id) on delete restrict,
   add constraint leads_pipeline_fk
     foreign key (organization_id,pipeline_id)
-    references public.pipelines(organization_id,id) on delete set null,
+    references public.pipelines(organization_id,id) on delete restrict,
   add constraint leads_stage_fk
     foreign key (stage_id) references public.pipeline_stages(id) on delete set null;
 
 alter table public.leads alter column organization_id set not null;
+
+alter table public.org_memberships
+  add constraint org_memberships_unit_fk
+    foreign key (organization_id,org_unit_id)
+    references public.org_units(organization_id,id) on delete restrict,
+  add constraint org_memberships_team_fk
+    foreign key (organization_id,team_id)
+    references public.teams(organization_id,id) on delete restrict;
 
 alter table public.automation_events
   add column if not exists organization_id uuid;
@@ -428,6 +436,64 @@ using (private.can_access_lead(organization_id,owner_user_id,org_unit_id,team_id
 drop policy if exists automation_events_org_select on public.automation_events;
 create policy automation_events_org_select on public.automation_events
 for select to authenticated using (private.is_org_member(organization_id));
+
+-- Compatibility triggers let the current pre-organization UI continue to create
+-- leads and automation events while the organization-aware UI is being introduced.
+create or replace function private.assign_default_org_to_lead()
+returns trigger
+language plpgsql security definer
+set search_path = ''
+as $
+declare
+  _user_id uuid;
+begin
+  _user_id := coalesce(new.user_id,new.owner_user_id,(select auth.uid()));
+  if new.user_id is null then new.user_id := _user_id; end if;
+  if new.owner_user_id is null then new.owner_user_id := _user_id; end if;
+  if new.organization_id is null then
+    select m.organization_id into new.organization_id
+    from public.org_memberships m
+    where m.user_id=_user_id and m.status='active'
+    order by case when m.role='owner' then 0 else 1 end, m.created_at
+    limit 1;
+  end if;
+  if new.organization_id is null then
+    raise exception 'No active LeadFlow organization is available for this user';
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.assign_default_org_to_lead() from public;
+drop trigger if exists leads_assign_default_org on public.leads;
+create trigger leads_assign_default_org
+before insert on public.leads
+for each row execute function private.assign_default_org_to_lead();
+
+create or replace function private.assign_org_to_automation_event()
+returns trigger
+language plpgsql security definer
+set search_path = ''
+as $
+begin
+  if new.organization_id is null and new.lead_id is not null then
+    select l.organization_id into new.organization_id
+    from public.leads l where l.id=new.lead_id;
+  end if;
+  if new.organization_id is null and new.user_id is not null then
+    select m.organization_id into new.organization_id
+    from public.org_memberships m
+    where m.user_id=new.user_id and m.status='active'
+    order by case when m.role='owner' then 0 else 1 end, m.created_at
+    limit 1;
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.assign_org_to_automation_event() from public;
+drop trigger if exists automation_events_assign_org on public.automation_events;
+create trigger automation_events_assign_org
+before insert on public.automation_events
+for each row execute function private.assign_org_to_automation_event();
 
 -- New signups receive a private default workspace and owner membership.
 create or replace function private.create_default_workspace_for_new_user()
