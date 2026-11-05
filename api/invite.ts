@@ -11,7 +11,7 @@ export default async function handler(req:any,res:any) {
     const email=clean(input.email,254).toLowerCase();
     const role=String(input.role||'employee');
     const accessScope=String(input.accessScope||'personal');
-    const orgUnitId=clean(input.orgUnitId,50), teamId=clean(input.teamId,50);
+    const orgUnitId=accessScope==='unit'?clean(input.orgUnitId,50):'', teamId=accessScope==='team'?clean(input.teamId,50):'';
     if(!/^[0-9a-f-]{36}$/i.test(organizationId)||!/^\S+@\S+\.\S+$/.test(email))
       return json(res,400,{error:'A valid workspace and email address are required'});
     if(!allowedRoles.has(role)||!allowedScopes.has(accessScope))
