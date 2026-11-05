@@ -71,10 +71,11 @@ Legacy `leads`, `settings`, and `automation_events` remain in place and now carr
 - Supabase performance advisor reported no unindexed foreign keys; remaining notices are unused-index INFO findings on empty tables.
 - Supabase security advisor returned no security findings after the organization foundation.
 - Existing preview build at commit `62c338243ebce74df1299f7599da8abed6dd3d3b` reached READY.
-- Vercel preview build for commit `3f0936f6595f7e22236a0614c8d72aae8b51009a` reached READY. The next commit adds more detailed Auth diagnostics and is still being verified.
+- Vercel preview build for commit `93f33b07992ad7c6cabe2f96dc882a5877bf0243` reached READY.
+- The deployed `/api/status` check returned Supabase configured, Supabase Auth reachable (HTTP 200), Gemini configured, the intake-rate salt present, and the n8n host allowlist present. The n8n webhook URL is not configured in server environment variables; per-workspace settings may still provide one.
 
 ## Not yet verified / next work
-- Complete browser signup/login and first-workspace onboarding with the user; the previous browser reported `Failed to fetch`. The server-side Auth diagnostic endpoint is being used to distinguish Supabase reachability from browser/network/CORS problems.
+- Complete browser signup/login and first-workspace onboarding with the user; the previous browser reported `Failed to fetch`. Server-side Auth is reachable (HTTP 200), so the remaining login check must be performed in the browser against the current preview to distinguish browser/network/CORS issues from client configuration.
 - End-to-end create/read/update tests for each business-record module.
 - Invite email delivery and acceptance; depends on Supabase Auth email configuration.
 - Existing-account invitation/adding, member role changes, removal, and bulk team assignment.
