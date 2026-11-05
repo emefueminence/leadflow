@@ -12,6 +12,7 @@ export async function canAccessLead(db: SupabaseClient, membership: any, lead: a
   if (!membership || membership.status !== 'active') return false;
   if (membership.role === 'owner' || membership.role === 'org_admin' || membership.access_scope === 'organization') return true;
   if (membership.access_scope === 'personal') return lead.owner_user_id === userId;
+  if ((membership.access_scope === 'unit' || membership.access_scope === 'team') && lead.owner_user_id === userId) return true;
   if (membership.access_scope === 'team') {
     if (!lead.team_id) return false;
     const { data, error } = await db.from('team_memberships').select('id')
