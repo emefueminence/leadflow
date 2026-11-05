@@ -4,7 +4,7 @@ import {supabase} from './supabase';
 type Org= {id:string;name:string;industry:string|null;business_model:string|null;company_size:'solo'|'small'|'medium'|'large'|'enterprise'};
 type Membership={role:string;access_scope:string;org_unit_id:string|null;team_id:string|null};
 const sizeLabels:Record<string,string>={solo:'Solo / individual',small:'Small business',medium:'Medium-sized company',large:'Large company',enterprise:'Enterprise'};
-export default function OrganizationPage({organization,membership,organizationId,onRefresh,flash}:{
+export default function OrganizationPage({organization,membership,organizationId,onRefresh,flash,onCreated}:{
  organization:Org|null;membership:Membership|null;organizationId:string;onRefresh:()=>void;flash:(message:string)=>void;onCreated:(id:string)=>void
 }) {
  const [profile,setProfile]=useState({name:'',industry:'',business_model:'',company_size:'solo'});
