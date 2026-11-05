@@ -11,7 +11,7 @@ export default function BusinessRecords({entity,organizationId,userId,pipelines,
   if(['contacts','opportunities','tasks'].includes(entity)){const [u,t]=await Promise.all([supabase.from('org_units').select('id,name').eq('organization_id',organizationId).order('name'),supabase.from('teams').select('id,name').eq('organization_id',organizationId).order('name')]);setUnits(u.data||[]);setTeams(t.data||[]);}
  }
  useEffect(()=>{load()},[entity,organizationId,pipelines]);
- async function submit(e:any){e.preventDefault();if(!supabase||!name.trim())return;setBusy(true);let row:any={organization_id:organizationId,created_by:userId};
+ async function submit(e:any){e.preventDefault();if(!supabase||!name.trim())return;setBusy(true);let row:any=entity==='activities'?{organization_id:organizationId}:{organization_id:organizationId,created_by:userId};
   if(entity==='accounts')row={...row,name:name.trim(),industry:industry||null,website:website||null,email:email||null,phone:phone||null};
   if(entity==='contacts')row={...row,name:name.trim(),email:email||null,phone:phone||null,account_id:accountId||null,owner_user_id:userId,org_unit_id:unitId||null,team_id:teamId||null};
   if(entity==='opportunities'){const s=stages.find((x:any)=>x.id===stageId);row={...row,name:name.trim(),description:description||null,value:value?Number(value):null,currency:'NGN',account_id:accountId||null,contact_id:contactId||null,pipeline_id:pipelineId||null,stage_id:stageId||null,status:s?.name||'Open',owner_user_id:userId,org_unit_id:unitId||null,team_id:teamId||null};}
