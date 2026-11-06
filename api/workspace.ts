@@ -7,8 +7,10 @@ export default async function handler(req:any,res:any) {
     const actor=await user(req), input=await body(req);
     const name=clean(input.name,160), industry=clean(input.industry,100), businessModel=clean(input.businessModel,100);
     const companySize=String(input.companySize||'solo');
+    const currency=String(input.currency||'NGN').toUpperCase();
     if(!name) return json(res,400,{error:'Workspace name is required'});
     if(!sizes.has(companySize)) return json(res,400,{error:'Invalid company size'});
+    if(!/^[A-Z]{3}$/.test(currency)) return json(res,400,{error:'Currency must be a valid three-letter code'});
     const db=admin();
     const {count}=await db.from('org_memberships').select('id',{count:'exact',head:true}).eq('user_id',actor.id).eq('status','active');
     if((count||0)>=10) return json(res,403,{error:'This account has reached the current workspace limit'});
@@ -32,8 +34,8 @@ export default async function handler(req:any,res:any) {
     })));
     if(stageError) throw stageError;
     const [{error:orgSettingsError},{error:legacySettingsError}]=await Promise.all([
-      db.from('organization_settings').insert({organization_id:org.id}),
-      db.from('settings').insert({organization_id:org.id,user_id:actor.id,business_name:name,currency:'NGN',timezone:'Africa/Lagos'})
+      db.from('organization_settings').insert({organization_id:org.id,currency}),
+      db.from('settings').insert({organization_id:org.id,user_id:actor.id,business_name:name,currency,timezone:'Africa/Lagos'})
     ]);
     if(orgSettingsError||legacySettingsError) throw orgSettingsError||legacySettingsError;
     return json(res,201,{ok:true,organizationId:org.id});
