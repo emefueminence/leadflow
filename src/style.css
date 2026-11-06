@@ -9,3 +9,5 @@
 .formcard .box .formgrid{align-items:end}
 
 .passwordfield{display:flex;align-items:stretch;gap:8px}.passwordfield input{flex:1;min-width:0}.passwordtoggle{border:1px solid #dce2ea;border-radius:8px;background:#f8fafc;color:#344256;padding:0 14px;font-weight:700;cursor:pointer}.authcard:has(.formgrid){width:min(760px,100%)}.authcard:has(.formgrid) .formgrid{gap:4px 16px}.authcard select,.authcard input{box-sizing:border-box}
+
+.department-performance{margin-top:18px}.department-performance>p{font-size:12px;color:#7a8496;margin-top:-6px}.department-row{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:8px 14px;align-items:center;padding:13px 0;border-bottom:1px solid #edf0f4}.department-label b,.department-label small{display:block}.department-label b{font-size:13px}.department-label small{font-size:11px;color:#7a8496;margin-top:3px}.department-row>strong{text-align:right;font-size:14px}.department-track{grid-column:1/3;height:8px;border-radius:10px;background:#edf1f4;overflow:hidden}.department-track i{display:block;height:100%;background:#15958b;border-radius:10px;min-width:0}
