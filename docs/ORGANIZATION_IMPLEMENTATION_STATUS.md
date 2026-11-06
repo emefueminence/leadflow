@@ -102,3 +102,14 @@ The database and application foundation is implemented, but this is not yet a pr
 - Latest preview deployment for commit `f763966a5d3c6465cc0a109223d065310ae181bf` reached READY. Public app HTML returned HTTP 200 and `/api/status` confirmed Supabase Auth HTTP 200, Gemini configured, and intake rate-limit salt configured.
 - Manual Supabase Auth URL Configuration remains necessary: set the Site URL to the stable preview URL for this testing phase and add the preview and production domains to Redirect URLs. Change Site URL to the production domain only when production is approved.
 - Supabase security advisor currently reports leaked-password protection disabled; enable this in Auth password security settings before production.
+
+
+## Existing-account linking and workspace currency (2026-11-06)
+- Organization invitations now look up an existing Supabase Auth account by email. Existing users can be added to a workspace without creating a second login; new users still receive an email invitation.
+- Existing active memberships are detected and rejected with a clear conflict rather than duplicated.
+- Team-scoped invitations also create the corresponding team-membership row.
+- The Members tab now distinguishes an existing-account addition from an email invitation in its success message.
+- Additional workspace creation now accepts a primary currency and persists it to both organization settings and the legacy workspace settings row.
+- Opportunity creation and value display now use the active workspace currency rather than hard-coded NGN.
+- Vercel preview build for commit `a419023b8b0878e5f59c47642855918d2b6442fe` reached READY. Build output confirms Vite transformed 2,122 modules and completed successfully.
+- The remaining high-priority work is end-to-end acceptance testing with real signup, existing-account invitation, role/scope isolation, and CRUD across accounts, contacts, opportunities, tasks and activities. No production deployment or merge was performed.
