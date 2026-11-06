@@ -88,3 +88,17 @@ A read-only count check returned zero auth users, organizations, leads, accounts
 
 ## Important
 The database and application foundation is implemented, but this is not yet a production release. Keep all work on `rebuild-v2` until end-to-end acceptance tests pass and the user explicitly approves production promotion.
+
+
+## Enterprise onboarding and supervisor update (2026-11-05)
+- Signup now captures organization name, industry, business model, company size, currency, branch count, and department count.
+- Signup explicitly sets `emailRedirectTo` to the current website origin.
+- The signup bootstrap trigger saves organization metadata, applies the chosen currency, and creates the requested number of initial branch and department units.
+- Password visibility toggle added to authentication form.
+- Invitation role label `Supervisor (read-only)` maps to the `viewer` role.
+- Database write policies now prevent viewer-role users from inserting, updating, or deleting business records; AI and automation endpoints also reject viewer-role requests.
+- Dashboard includes department-level lead conversion metrics (Won / visible leads), based on actual RLS-visible records.
+- Transactional database test exercised signup metadata initialization and confirmed a viewer could read an assigned organization record but could not update or insert; all temporary test users/records were rolled back.
+- Latest preview deployment for commit `f763966a5d3c6465cc0a109223d065310ae181bf` reached READY. Public app HTML returned HTTP 200 and `/api/status` confirmed Supabase Auth HTTP 200, Gemini configured, and intake rate-limit salt configured.
+- Manual Supabase Auth URL Configuration remains necessary: set the Site URL to the stable preview URL for this testing phase and add the preview and production domains to Redirect URLs. Change Site URL to the production domain only when production is approved.
+- Supabase security advisor currently reports leaked-password protection disabled; enable this in Auth password security settings before production.
