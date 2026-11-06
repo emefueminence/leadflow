@@ -7,3 +7,5 @@
 .formcard .box{display:grid;gap:8px}
 .formcard .box small{color:#6d7788;line-height:1.5}
 .formcard .box .formgrid{align-items:end}
+
+.passwordfield{display:flex;align-items:stretch;gap:8px}.passwordfield input{flex:1;min-width:0}.passwordtoggle{border:1px solid #dce2ea;border-radius:8px;background:#f8fafc;color:#344256;padding:0 14px;font-weight:700;cursor:pointer}.authcard:has(.formgrid){width:min(760px,100%)}.authcard:has(.formgrid) .formgrid{gap:4px 16px}.authcard select,.authcard input{box-sizing:border-box}
