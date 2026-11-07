@@ -11,7 +11,7 @@ export default function Projects({organizationId,membership,currency,flash}:any)
  const [milestoneTitle,setMilestoneTitle]=useState(''),[milestoneDue,setMilestoneDue]=useState(''),[milestoneOwner,setMilestoneOwner]=useState('');
  const [editStatus,setEditStatus]=useState('planned');
  const canWrite=membership?.role!=='viewer';
- const teamOptions=useMemo(()=>teams.filter(t=>!unit||t.org_unit_id===unit),[teams,unit]);
+ const teamOptions=useMemo(()=>teams.filter(t=>unit?t.org_unit_id===unit:!t.org_unit_id),[teams,unit]);
  async function load(){
   if(!supabase||!organizationId)return;setBusy(true);setError('');
   const [p,m,mem,u,t]=await Promise.all([
