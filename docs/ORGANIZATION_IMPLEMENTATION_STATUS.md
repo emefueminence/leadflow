@@ -123,3 +123,16 @@ The database and application foundation is implemented, but this is not yet a pr
 - Database transaction test created, updated and deleted a temporary account, verified exactly three ordered audit events and confirmed the record label did not expose its business name; test rolled back all test data.
 - Preview deployment `dpl_DqGc7eGK6s7735EvJuGivmgjqoWJ` reached READY for commit `db990867a2b2637cec874f39c4a9705cbc2b0f8f`. Preview root and `/api/status` returned HTTP 200; status reports Supabase and Auth reachable, Gemini configured, and intake rate-limit salt configured.
 - Security advisor currently reports only the previously known warning that leaked-password protection is disabled. Production remains untouched.
+
+
+## Enterprise analytics upgrade (2026-11-07)
+- Rebuilt the Analytics workspace page with six-month trend charts for lead creation, won opportunities and completed tasks.
+- Added KPIs for accessible leads and conversion, opportunities, won opportunity value, open pipeline value, task completion and recorded activities.
+- Added branch/department comparison table with lead conversion and task completion rates plus won opportunity value; added team performance and individual workload/output views.
+- Added period, organizational unit and team filters plus CSV export.
+- Restricted unit/team comparison options in the UI to the membership's organization, unit subtree or assigned team. Underlying data remains fetched through the authenticated Supabase client and filtered by database RLS; UI filters never grant access.
+- Analytics queries now paginate in 1,000-row pages up to 10,000 rows per record category rather than silently relying on a single PostgREST response page. A cap warning is displayed when a category reaches the limit.
+- Opportunity monetary totals only aggregate values in the active workspace currency. Other currencies are excluded and disclosed; no exchange rate is fabricated.
+- Profit is explicitly not calculated because no cost/expense ledger exists yet. Won opportunity value is labelled as opportunity value, not accounting revenue.
+- Vercel preview deployment `dpl_2DeAECZz3JMGfmn9KWo871o6bxwZ` reached READY for commit `37b8e6b2a3d9684bbc927e6e0947d4bb07d07ae9`; preview root and `/api/status` returned HTTP 200. The compiled application bundle contains the new analytics sections.
+- No database schema changes, production deployment, or merge to `main` were performed.
