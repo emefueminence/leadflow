@@ -113,3 +113,13 @@ The database and application foundation is implemented, but this is not yet a pr
 - Opportunity creation and value display now use the active workspace currency rather than hard-coded NGN.
 - Vercel preview build for commit `a419023b8b0878e5f59c47642855918d2b6442fe` reached READY. Build output confirms Vite transformed 2,122 modules and completed successfully.
 - The remaining high-priority work is end-to-end acceptance testing with real signup, existing-account invitation, role/scope isolation, and CRUD across accounts, contacts, opportunities, tasks and activities. No production deployment or merge was performed.
+
+
+## Organization audit history (2026-11-07)
+- Added `public.audit_logs` with organization-scoped RLS. Read access is restricted to active owners, organization admins and managers; direct client insert/update/delete is denied.
+- Added a SECURITY DEFINER trigger function that records INSERT, UPDATE and DELETE events for leads, accounts, contacts, opportunities, tasks, activities, memberships, organizational units, teams, pipelines, pipeline stages, custom-field definitions, organizations and organization settings.
+- Audit events capture actor ID, action, entity/table, record ID, optional unit/team scope, timestamp and changed field names. They intentionally do not store old/new values, customer names, email addresses, phone numbers or message content.
+- Added Organization → Audit history with action filters and search. UI is available to owners, admins and managers; database RLS remains the enforcement boundary.
+- Database transaction test created, updated and deleted a temporary account, verified exactly three ordered audit events and confirmed the record label did not expose its business name; test rolled back all test data.
+- Preview deployment `dpl_DqGc7eGK6s7735EvJuGivmgjqoWJ` reached READY for commit `db990867a2b2637cec874f39c4a9705cbc2b0f8f`. Preview root and `/api/status` returned HTTP 200; status reports Supabase and Auth reachable, Gemini configured, and intake rate-limit salt configured.
+- Security advisor currently reports only the previously known warning that leaked-password protection is disabled. Production remains untouched.
