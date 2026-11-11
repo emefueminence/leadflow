@@ -5,7 +5,7 @@ function webhookValidation(raw:string):string|null {
   let u:URL;
   try { u = new URL(raw); } catch { return 'Enter the complete n8n production webhook URL, starting with https://'; }
   if (u.protocol !== 'https:') return 'The webhook URL must use HTTPS.';
-  if (u.username || u.password || u.hash) return 'Remove any embedded username, password, or URL fragment.';
+  if (u.username || u.password || u.hash || (u.port && u.port !== '443')) return 'Remove embedded credentials, URL fragments, and non-standard ports.';
   const allow = (process.env.N8N_ALLOWED_HOSTS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
   if (!allow.length) return 'The server has no n8n hostname allowlist configured. Contact the workspace administrator.';
   if (!allow.includes(u.hostname.toLowerCase())) return 'This n8n hostname is not allowed for this LeadFlow deployment.';
