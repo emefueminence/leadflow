@@ -1,13 +1,17 @@
 import { admin, body, json, user, clean } from './_shared.js';
 import { getActiveMembership } from './_org.js';
 
-function allowedWebhook(raw:string) {
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== 'https:') return false;
-    const allow = (process.env.N8N_ALLOWED_HOSTS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
-    return allow.length > 0 && allow.includes(u.hostname.toLowerCase());
-  } catch { return false; }
+function webhookValidation(raw:string):string|null {
+  let u:URL;
+  try { u = new URL(raw); } catch { return 'Enter the complete n8n production webhook URL, starting with https://'; }
+  if (u.protocol !== 'https:') return 'The webhook URL must use HTTPS.';
+  if (u.username || u.password || u.hash) return 'Remove any embedded username, password, or URL fragment.';
+  const allow = (process.env.N8N_ALLOWED_HOSTS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+  if (!allow.length) return 'The server has no n8n hostname allowlist configured. Contact the workspace administrator.';
+  if (!allow.includes(u.hostname.toLowerCase())) return 'This n8n hostname is not allowed for this LeadFlow deployment.';
+  if (!u.pathname.startsWith('/webhook/') || u.pathname.toLowerCase().startsWith('/webhook-test/'))
+    return 'Use the active Production URL from the n8n Webhook node. It must contain /webhook/, not /webhook-test/.';
+  return null;
 }
 
 export default async function handler(req:any,res:any) {
@@ -35,8 +39,10 @@ export default async function handler(req:any,res:any) {
 
     if (action !== 'save') return json(res,400,{error:'Unsupported integration action'});
     const webhookUrl = clean(input.webhookUrl,2048);
-    if (webhookUrl && !allowedWebhook(webhookUrl))
-      return json(res,400,{error:'Webhook must use HTTPS and a hostname on the server allowlist'});
+    if (webhookUrl) {
+      const validationError = webhookValidation(webhookUrl);
+      if (validationError) return json(res,400,{error:validationError});
+    }
     if (!webhookUrl) {
       const {error} = await db.from('integration_secrets').delete().eq('organization_id',organizationId);
       if (error) throw error;
