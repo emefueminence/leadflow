@@ -31,22 +31,23 @@ export default async function handler(req:any,res:any) {
         .select('n8n_webhook_url,last_n8n_status,last_n8n_detail,last_n8n_at')
         .eq('organization_id',organizationId).maybeSingle();
       if (error) throw error;
-      return json(res,200,{ok:true,n8n_webhook_url:data?.n8n_webhook_url || '',
+      return json(res,200,{ok:true,configured:Boolean(data?.n8n_webhook_url),
         last_n8n_status:data?.last_n8n_status || null,
         last_n8n_detail:data?.last_n8n_detail || null,
         last_n8n_at:data?.last_n8n_at || null});
     }
 
-    if (action !== 'save') return json(res,400,{error:'Unsupported integration action'});
-    const webhookUrl = clean(input.webhookUrl,2048);
-    if (webhookUrl) {
-      const validationError = webhookValidation(webhookUrl);
-      if (validationError) return json(res,400,{error:validationError});
-    }
-    if (!webhookUrl) {
+    if (action === 'remove') {
       const {error} = await db.from('integration_secrets').delete().eq('organization_id',organizationId);
       if (error) throw error;
       return json(res,200,{ok:true,configured:false});
+    }
+    if (action !== 'save') return json(res,400,{error:'Unsupported integration action'});
+    const webhookUrl = clean(input.webhookUrl,2048);
+    if (!webhookUrl) return json(res,400,{error:'Enter a webhook URL to save. Use Remove connection to disconnect.'});
+    if (webhookUrl) {
+      const validationError = webhookValidation(webhookUrl);
+      if (validationError) return json(res,400,{error:validationError});
     }
     const {error} = await db.from('integration_secrets').upsert({
       organization_id:organizationId,n8n_webhook_url:webhookUrl,
