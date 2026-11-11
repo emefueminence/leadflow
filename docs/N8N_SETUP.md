@@ -11,6 +11,7 @@ LeadFlow stores each workspace's n8n webhook URL in the server-only `integration
 4. The hostname must exactly match the `N8N_ALLOWED_HOSTS` environment variable in the LeadFlow Vercel preview/production environment, as appropriate.
 5. In LeadFlow, open **Integrations → n8n workflow automation**, paste the URL and select **Save connection**.
 6. LeadFlow should report that the URL is saved but unverified. Saving checks the URL format and hostname; it does not prove that the workflow is active or that a delivery succeeded.
+7. The **Automation** page displays the saved webhook URL and delivery status. Use **Manage connection** there to edit it; the **Integrations** page remains the place where the URL is saved.
 
 Do not paste a temporary `/webhook-test/` URL. Do not paste your n8n login credentials, API key, or account password.
 
